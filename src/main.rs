@@ -1,8 +1,26 @@
+use actix_web::{web, App, HttpResponse, HttpServer, Responder};
 use rand::Rng;
 use std::cmp::Ordering;
 use std::io;
+mod endpoints;
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
+    HttpServer::new(|| {
+        App::new()
+            .service(endpoints::hello)
+            .service(endpoints::echo)
+            .route("/hey", web::get().to(manual_hello))
+    })
+    .bind("127.0.0.1:8080")?
+    .run()
+    .await
+}
 
-fn main() {
+async fn manual_hello() -> impl Responder {
+    HttpResponse::Ok().body("Hey there!")
+}
+
+fn guess_a_number() {
     println!("Hello!");
     let secret_number = rand::thread_rng().gen_range(1..101);
     println!("The secret number is {}", secret_number);
@@ -23,15 +41,7 @@ fn main() {
                 println!("Win yeahea !");
                 break;
             }
-
             Ordering::Greater => println!("Too high"),
         }
-        // if secret_number == guess_as_integer {
-        //     println!("Well done!");
-        // } else {
-        //     println!("Not the same !")
-        // }
-        // println!("{}", guess_from_user.to_string());
-        // println!("{}", secret_number);
     }
 }
